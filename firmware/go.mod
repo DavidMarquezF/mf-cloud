@@ -1,4 +1,4 @@
-module github.com/mf-embedded-firmware
+module github.com/DavidMarquezF/mf-cloud/firmware
 
 go 1.14
 
