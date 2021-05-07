@@ -15,6 +15,7 @@ import (
 	"github.com/plgd-dev/go-coap/v2/dtls"
 	"github.com/plgd-dev/go-coap/v2/mux"
 	"github.com/plgd-dev/go-coap/v2/net"
+	"github.com/plgd-dev/go-coap/v2/net/blockwise"
 )
 
 //Server a configuration of coapgateway
@@ -24,7 +25,6 @@ type Server struct {
 	Addr                            string // Address to listen on, ":COAP" if empty.
 	IsTLSListener                   bool
 	KeepaliveTimeoutConnection      time.Duration
-	KeepaliveOnInactivity           func(cc inactivity.ClientConn)
 	DisableTCPSignalMessageCSM      bool
 	DisablePeerTCPSignalMessageCSMs bool
 	SendErrorTextInResponse         bool
@@ -36,8 +36,8 @@ type Server struct {
 	MaxMessageSize                  int
 	LogMessages                     bool
 
-	coapServer *tcp.Server
-	listener   tcp.Listener
+	coapServer *dtls.Server
+	listener   dtls.Listener
 
 	ctx    context.Context
 	cancel context.CancelFunc
@@ -51,8 +51,7 @@ type ListenCertManager = interface {
 
 // New creates server.
 func New(config Config, dtlsConfig *piondtls.Config) *Server {
-	var listener tcp.Listener
-	var isTLSListener bool
+	var listener dtls.Listener
 
 	l, err := net.NewDTLSListener("udp", config.Addr, dtlsConfig)
 	if err != nil {
@@ -118,9 +117,9 @@ func (server *Server) setupCoapServer() {
 	//m.DefaultHandle(mux.HandlerFunc(handleA))
 	m.Handle(uri.Executable, mux.HandlerFunc(getExecFile))
 
-	opts := make([]tcp.ServerOption, 0, 5)
-	opts = append(opts, dtls.WithMux(handler))
-	return dtls.NewServer(opts...)
+	opts := make([]dtls.ServerOption, 0, 5)
+	opts = append(opts, dtls.WithMux(m))
+	server.coapServer = dtls.NewServer(opts...)
 
 }
 

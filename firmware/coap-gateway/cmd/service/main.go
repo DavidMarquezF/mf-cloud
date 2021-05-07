@@ -1,10 +1,15 @@
 package main
 
 import (
+	"crypto/tls"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 
 	"github.com/DavidMarquezF/mf-cloud/firmware/coap-gateway/service"
 	"github.com/kelseyhightower/envconfig"
+	piondtls "github.com/pion/dtls/v2"
+	"github.com/plgd-dev/go-coap/v2/examples/dtls/pki"
 	"github.com/plgd-dev/kit/log"
 	"github.com/plgd-dev/kit/security/certManager"
 )
@@ -15,7 +20,12 @@ type Config struct {
 	Log     log.Config            `envconfig:"LOG"`
 }
 type Impl struct {
-	service           *service.Server
+	service *service.Server
+}
+
+func (c Config) String() string {
+	b, _ := json.MarshalIndent(c, "", "  ")
+	return fmt.Sprintf("config: \n%v\n", string(b))
 }
 
 func Init(config Config) (*Impl, error) {
@@ -23,27 +33,27 @@ func Init(config Config) (*Impl, error) {
 	log.Info(config.String())
 
 	dtlsConfig, err := createServerConfig(config.Listen)
-	if err != nil{
+	if err != nil {
 		log.Fatalf("Error creating DTLS config: %v", err)
 		return nil, err
 	}
 
 	return &Impl{
-		service:           service.New(config.Service, dtlsConfig),
+		service: service.New(config.Service, dtlsConfig),
 	}, nil
 }
 
-func createServerConfig(config *certManager.OcfConfig) (*piondtls.Config, error) {
+func createServerConfig(config certManager.OcfConfig) (*piondtls.Config, error) {
 
 	var keyBytes []byte
 	var certBytes []byte
 	var err error
-	keyBytes, err = ioutil.ReadFile(keyPath := config.DirPath + "/" + config.TLSKeyFileName)
+	keyBytes, err = ioutil.ReadFile(config.File.DirPath + "/" + config.File.TLSKeyFileName)
 	if err != nil {
 		return nil, err
 	}
 
-	certBytes, err = ioutil.ReadFile(config.DirPath + "/" + config.TLSCertFileName)
+	certBytes, err = ioutil.ReadFile(config.File.DirPath + "/" + config.File.TLSCertFileName)
 	if err != nil {
 		return nil, err
 	}
@@ -64,14 +74,13 @@ func createServerConfig(config *certManager.OcfConfig) (*piondtls.Config, error)
 }
 
 // Serve starts handling coap requests.
-func (r *RefImpl) Serve() error {
+func (r *Impl) Serve() error {
 	return r.service.Serve()
 }
 
 // Shutdown shutdowns the service.
-func (r *RefImpl) Shutdown() error {
+func (r *Impl) Shutdown() error {
 	err := r.service.Shutdown()
-	r.dialCertManager.Close()
 	return err
 }
 
