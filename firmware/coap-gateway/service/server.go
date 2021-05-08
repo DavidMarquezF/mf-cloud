@@ -115,7 +115,7 @@ func (server *Server) setupCoapServer() {
 
 	m := mux.NewRouter()
 	//m.DefaultHandle(mux.HandlerFunc(handleA))
-	m.Handle(uri.Executable, mux.HandlerFunc(getExecFile))
+	m.HandleFunc(uri.Executable, getExecFile)
 
 	opts := make([]dtls.ServerOption, 0, 5)
 	opts = append(opts, dtls.WithMux(m))
