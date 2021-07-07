@@ -6,6 +6,8 @@ type ModuleId int
 const (
 	Ultrasound  ModuleId = 1
 	Temperature ModuleId = 2
+	Semaphore   ModuleId = 3
+	Button      ModuleId = 4
 )
 
 type Platform int
