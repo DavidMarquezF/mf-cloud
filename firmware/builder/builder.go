@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"strings"
 
 	mfModules "github.com/DavidMarquezF/mf-cloud/firmware/modules"
@@ -35,6 +34,22 @@ var modules = map[mfModules.ModuleId]moduleInfo{
 		InitCb:           "mf_temp_init",
 		DestroyCb:        "mf_temp_destroy",
 	},
+	mfModules.Semaphore: moduleInfo{
+		Include:          "mf_semaphore.h",
+		DefaultName:      "semaphore",
+		DefaultUrl:       "/semaph",
+		CreateResourceCb: "mf_semaphore_create_resource",
+		InitCb:           "mf_semaphore_init",
+		DestroyCb:        "mf_semaphore_destroy",
+	},
+	mfModules.Button: moduleInfo{
+		Include:          "mf_button.h",
+		DefaultName:      "button",
+		DefaultUrl:       "/button",
+		CreateResourceCb: "mf_button_create_resource",
+		InitCb:           "mf_button_init",
+		DestroyCb:        "mf_button_destroy",
+	},
 }
 
 func writeStringNL(builder *strings.Builder, val string) {
@@ -62,7 +77,7 @@ func getPropertyString(name string, value string) string {
 	return "." + name + " = " + value
 }
 
-func buildFileString(config mfModules.FirmwareConfig) string {
+func BuildFileString(config mfModules.FirmwareConfig) string {
 	var b strings.Builder
 	builder := &b
 	startHeader(builder)
@@ -99,20 +114,4 @@ func buildFileString(config mfModules.FirmwareConfig) string {
 	endHeader(builder)
 
 	return builder.String()
-}
-
-func main() {
-	config := mfModules.FirmwareConfig{
-		DeviceId: "sdasd",
-		Platform: mfModules.ESP32,
-		Modules: []mfModules.Module{
-			mfModules.Module{
-				Id: mfModules.Ultrasound,
-			},
-			mfModules.Module{
-				Id: mfModules.Temperature,
-			},
-		},
-	}
-	log.Print(buildFileString(config))
 }
