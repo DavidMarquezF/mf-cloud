@@ -148,7 +148,7 @@ func (c *Ocfclient) SetAccessForCloud(deviceID string) error {
 						DeviceID: c.cloudConfiguration.GetCloudId(),
 					},
 				},
-				Resources: []acl.Resource{acl.Resource{Href: "/oic/sec/pstat"}},
+				Resources: []acl.Resource{acl.Resource{Href: "/oic/sec/pstat"}, acl.Resource{Href: "/sw"}},
 			},
 		},
 	}
@@ -170,7 +170,7 @@ func (c *Ocfclient) OnboardDevice(deviceID, authCode string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	authorizationProvider := c.cloudConfiguration.GetCloudAuthorizationProvider()
-	cloudURL := "coaps+tcp://192.168.1.158:5684" //c.cloudConfiguration.GetCloudUrl()
+	cloudURL := c.cloudConfiguration.GetCloudUrl()
 	cloudID := c.cloudConfiguration.GetCloudId()
 	return c.localClient.OnboardDevice(ctx, deviceID, authorizationProvider, cloudURL, authCode, cloudID)
 }
