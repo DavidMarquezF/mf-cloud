@@ -74,7 +74,7 @@ func createFirmware(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fileName := "mf_embedded.elf"
+	fileName := "mf_embedded.bin"
 	w.Header().Set("Content-Disposition", "attachment; filename="+strconv.Quote(fileName))
 	w.Header().Set("Content-Type", "application/octet-stream")
 	http.ServeFile(w, r, filepath.Join(mfEmbbedPath, "build", fileName))
@@ -85,7 +85,7 @@ func createFirmware(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	log.Print(os.Getenv("IDF_PATH"))
-	http.HandleFunc("/createFirmware", createFirmware)
+	http.HandleFunc("/create-firmware", createFirmware)
 
 	http.ListenAndServe(":8091", nil)
 

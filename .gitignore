@@ -1,2 +1,3 @@
 firmware/go.sum
 firmware/coap-gateway/certs/*
+firmware/certs/*

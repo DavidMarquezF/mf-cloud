@@ -11,4 +11,4 @@ echo $DATA
 curl --header "Content-Type: application/json" \
   --request POST \
   --data "$DATA" \
-  http://localhost:8091/createFirmware > test.elf
+  http://localhost:8091/create-firmware > test.elf
