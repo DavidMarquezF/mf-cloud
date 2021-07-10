@@ -1,0 +1,85 @@
+version: "3.9"
+services:
+  firmware-http-gateway:
+    build: http-gateway
+    ports:
+      - "8090:8090"
+    networks:
+      - mongodb_network
+      - builder_network
+    depends_on:
+      - mongodb
+    environment:
+      - MF_MONGO_DB_SERVER=mongodb
+      - MF_BUILDER_SERVER=firmware-builder
+      - MF_BUILDER_SERVER_PORT=8091
+      - MF_CONFIG_MONGODB_ADMINUSERNAME=root
+      - MF_CONFIG_MONGODB_ADMINPASSWORD=pass12345
+  firmware-builder:
+    build: builder
+    networks:
+      - builder_network
+  #firmware-coap-gateway:
+  #  build: coap-gateway
+  #  ports: 
+  #    - "5690:5682" #Set the port to another one so that it doesn't conflict with plgd
+  #  networks:
+  #    - mongodb_network
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    ports: 
+      - "27018:27017" #Set the port to another one so that it doesn't conflict with plgd
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=pass12345
+    volumes:
+      - type: volume
+        source: mongodb-data
+        target: /data
+        volume:
+          nocopy: true
+    networks:
+      - mongodb_network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongo 10.10.10.60:27017/test --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=pass12345
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin123
+    volumes:
+      - type: volume
+        source: mongodb-data
+        target: /data
+        volume:
+          nocopy: true
+    depends_on:
+      - mongodb
+    networks:
+      - mongodb_network
+    ports:
+      - 8081:8081
+    healthcheck:
+      test:  wget --quiet --tries=3 --spider http://admin:admin123@10.10.10.60:8081 || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+volumes:
+  mongodb-data:
+networks:
+  mongodb_network:
+    name: mongodb_network
+  builder_network:
+    name: builder_network
+
