@@ -3,8 +3,6 @@
 #set -e
 
 
-export RESOURCE_AGGREGATE_ADDRESS="$PLGD_DEV_FQDN:${RESOURCE_AGGREGATE_PORT}"
-export HTTP_GATEWAY_ADDRESS="localhost:${HTTP_GATEWAY_PORT}"
 
 export CERTIFICATES_PATH="./certs"
 export LOGS_PATH="./log"
@@ -28,28 +26,14 @@ export CA_POOL_CERT_KEY_PATH="$CA_POOL_DIR/$CA_POOL_NAME_PREFIX.key"
 export LISTEN_TYPE="file"
 export LISTEN_FILE_CA_POOL="$CA_POOL_CERT_PATH"
 
-# DIAL CERTS
-export DIAL_TYPE="file"
-export DIAL_FILE_CA_POOL="$CA_POOL_CERT_PATH"
-export DIAL_FILE_CERT_DIR_PATH="$INTERNAL_CERT_DIR_PATH"
-export DIAL_FILE_CERT_NAME="$GRPC_INTERNAL_CERT_NAME"
-export DIAL_FILE_CERT_KEY_NAME="$GRPC_INTERNAL_CERT_KEY_NAME"
-export DIAL_FILE_USE_SYSTEM_CERTIFICATION_POOL="true"
-
 
 export EXTERNAL_CERT_DIR_PATH="$CERTIFICATES_PATH/external"
 
 export FIRMWARE_COAP_FILE_CERT_NAME="firmware-coap.crt"
 export FIRMWARE_COAP_FILE_CERT_KEY_NAME="firmware-coap.key"
 
-export COAP_GATEWAY_UNSECURE_FQDN=$FQDN
-export COAP_GATEWAY_FQDN=$FQDN
-
 
 mkdir -p $LOGS_PATH
-
-echo "generating COAP-GW cert"
-#certificate-generator --cmd.generateIdentityCertificate=$COAP_GATEWAY_CLOUD_ID --outCert=$EXTERNAL_CERT_DIR_PATH/$COAP_GATEWAY_FILE_CERT_NAME --outKey=$EXTERNAL_CERT_DIR_PATH/$COAP_GATEWAY_FILE_CERT_KEY_NAME --cert.san.domain=$COAP_GATEWAY_FQDN --signerCert=$CA_POOL_CERT_PATH --signerKey=$CA_POOL_CERT_KEY_PATH
 
 
 echo "starting coap-gateway-secure"
@@ -66,7 +50,7 @@ export LISTEN_FILE_DISABLE_VERIFY_CLIENT_CERTIFICATE=${FIRMWARE_COAP_DISABLE_VER
 export DISABLE_BLOCKWISE_TRANSFER=false 
 export BLOCKWISE_TRANSFER_SZX=${FIRMWARE_COAP_BLOCKWISE_TRANSFER_SZX}
 export DISABLE_PEER_TCP_SIGNAL_MESSAGE_CSMS=${FIRMWARE_COAP_DISABLE_PEER_TCP_SIGNAL_MESSAGE_CSMS} 
-./firmware-coap >$LOGS_PATH/firmware-coap.log 2>&1 &
+./firmware-coap >$LOGS_PATH/firmware-coap.log 2>&1 
 status=$?
 if [ $status -ne 0 ]; then
   echo "Failed to start coap-gateway: $status"

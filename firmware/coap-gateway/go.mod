@@ -15,7 +15,7 @@ require (
 	github.com/pion/dtls/v2 v2.0.9
 	github.com/plgd-dev/cloud v1.1.3-0.20210507093653-dea063b74876
 	github.com/plgd-dev/cqrs v0.0.0-20201204150755-6ed1490c857f // indirect
-	github.com/plgd-dev/go-coap/v2 v2.4.0
+	github.com/plgd-dev/go-coap/v2 v2.4.1-0.20210517130748-95c37ac8e1fa
 	github.com/plgd-dev/kit v0.0.0-20210614190235-99984a49de48
 
 	//	github.com/plgd-dev/kit v0.0.0-20210322121129-fa0d31a13679
@@ -25,7 +25,7 @@ require (
 	google.golang.org/grpc v1.34.0
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/square/go-jose.v2 v2.5.1 // indirect
-	gopkg.in/yaml.v2 v2.3.0
+	gopkg.in/yaml.v2 v2.4.0
 
 )
 
