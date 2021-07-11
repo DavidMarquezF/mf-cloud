@@ -1,28 +1,41 @@
-FROM golang:1.15-alpine
-ARG root_directory=$GOPATH/src/github.com/DavidMarquezF/mf-cloud/firmware/coap-gateway
-RUN apk add --no-cache curl git build-base
-WORKDIR $root_directory
-COPY go.mod go.sum ./
+FROM golang:1.15-alpine as build
+# Set necessary environmet variables needed for our image
+
+RUN apk add --no-cache build-base
+
+# Move to working directory /build
+WORKDIR /build
+
+# Copy and download dependency using go mod
+COPY go.mod .
+COPY go.sum .
 RUN go mod download
+
+# Copy the code into the container
 COPY . .
 
-ARG service=firmware-coap
-RUN go build -ldflags "-linkmode external -extldflags -static" -o /go/bin/$service ./cmd/service
+# Build the application
+RUN go build -ldflags "-linkmode external -extldflags -static" -o main ./cmd/service
 
-FROM ubuntu:20.04 as service
+FROM ubuntu:20.04
+
 RUN apt update
-COPY --from=build /go/bin/$service /usr/local/bin/$service
+RUN apt install -y wget gnupg iproute2 systemctl openssl nginx ca-certificates
+RUN wget https://github.com/mikefarah/yq/releases/download/v4.6.3/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq
+
+# Copy binary from build to main folder
+COPY --from=build /build/main firmware-coap
 COPY run.sh /usr/local/bin/run.sh
 
 # global
-ENV FQDN="localhost"
+ENV FIRMWARE_COAP_FQDN="localhost"
 
 # coap-gateway
-ENV FIRMWARE_COAP_PORT=5684
-ENV FIRMWARE_COAP_ADDRESS="0.0.0.0:$COAP_GATEWAY_PORT"
+ENV FIRMWARE_COAP_PORT=5682
+ENV FIRMWARE_COAP_ADDRESS="0.0.0.0:$FIRMWARE_COAP_PORT"
 ENV FIRMWARE_COAP_DISABLE_VERIFY_CLIENTS=true
 ENV FIRMWARE_COAP_BLOCKWISE_TRANSFER_SZX=1024
 ENV FIRMWARE_COAP_LOG_MESSAGES=true
 
 
-ENTRYPOINT ["/usr/local/bin/run.sh"]
+CMD ["/usr/local/bin/run.sh"]
