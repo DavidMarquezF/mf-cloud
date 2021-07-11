@@ -2,6 +2,8 @@ cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMT
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/DavidMarquezF/mf-cloud v0.0.0-20210710152733-1357ed9f19d1 h1:ciLvNZhKJ/dIGBlhjPCOSjmuav/u0xaAgm2FDmLvW7w=
+github.com/DavidMarquezF/mf-cloud v0.0.0-20210711152338-29992d00861c h1:Nl/v2McS0P8OLZcjDm7yCOGYvatecDs5YFUUTPfW+dA=
+github.com/DavidMarquezF/mf-cloud v0.0.0-20210711152338-29992d00861c/go.mod h1:8Y7/3RMynnm86qqfGRpddDkS1vV0eRw3rhDNF2f/z8k=
 github.com/DavidMarquezF/mf-cloud/firmware v0.0.0-20210710143433-366e18128c16 h1:+Mq0fCHnQRHDYlsxZDoC19802DcEC7eiUnreWMftlpg=
 github.com/DavidMarquezF/mf-cloud/firmware v0.0.0-20210710143433-366e18128c16/go.mod h1:5paBmcQwKeE07m33uGpe5BuswUV8M7ibzbufVTS27SQ=
 github.com/aws/aws-sdk-go v1.34.28 h1:sscPpn/Ns3i0F4HPEWAVcwdIRaZZCuL7llJ2/60yPIk=

@@ -232,7 +232,7 @@ func (h *BaseHandler) createFirmware(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	err = changePurl(&body, w, "coap://"+os.Getenv("MF_COAP_GATEWAY_SERVER")+":"+os.Getenv("MF_COAP_GATEWAY_SERVER_PORT")+"/api/v1/fmw/"+body.DeviceId+"/exec")
+	err = changePurl(&body, w, "coaps://"+os.Getenv("MF_COAP_GATEWAY_SERVER")+":"+os.Getenv("MF_COAP_GATEWAY_SERVER_PORT")+"/api/v1/fmw/"+body.DeviceId+"/exec")
 	if err != nil {
 		return
 	}
