@@ -29,6 +29,15 @@ services:
       - MF_MONGO_DB_SERVER=mongodb
       - MF_CONFIG_MONGODB_ADMINUSERNAME=root
       - MF_CONFIG_MONGODB_ADMINPASSWORD=pass12345
+      - MF_CERTS_PATH=/certs
+      - MF_COAP_PORT
+    depends_on:
+      - mongodb
+    volumes:
+      - type: volume
+        read_only: true
+        source: certs
+        target: /certs
   mongodb:
     image: mongo
     container_name: mongodb
@@ -81,6 +90,12 @@ services:
     restart: unless-stopped
 volumes:
   mongodb-data:
+  certs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: "${PWD}/certs"
 networks:
   mongodb_network:
     name: mongodb_network
