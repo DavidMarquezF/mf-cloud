@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
+	"time"
 
 	"github.com/DavidMarquezF/mf-cloud/firmware/coap-gateway/service"
 	"github.com/kelseyhightower/envconfig"
@@ -12,6 +15,10 @@ import (
 	"github.com/plgd-dev/go-coap/v2/examples/dtls/pki"
 	"github.com/plgd-dev/kit/log"
 	"github.com/plgd-dev/kit/security/certManager"
+	"go.mongodb.org/mongo-driver/mongo"
+
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 type Config struct {
@@ -28,6 +35,30 @@ func (c Config) String() string {
 	return fmt.Sprintf("config: \n%v\n", string(b))
 }
 
+func connectToMongoDb() (*mongo.Client, error) {
+	// Prepare mongodb
+	mongoURI := "mongodb://" + os.Getenv("MF_MONGO_DB_SERVER") + ":27017"
+	log.Printf("MONGO URI: %s", mongoURI)
+	credential := options.Credential{
+		Username: os.Getenv("MF_CONFIG_MONGODB_ADMINUSERNAME"),
+		Password: os.Getenv("MF_CONFIG_MONGODB_ADMINPASSWORD"),
+	}
+	client, err := mongo.NewClient(options.Client().ApplyURI(mongoURI).SetAuth(credential))
+	if err != nil {
+		return nil, err
+	}
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	err = client.Connect(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer client.Disconnect(ctx)
+	err = client.Ping(ctx, readpref.Primary())
+	if err != nil {
+		return nil, err
+	}
+	return client, nil
+}
 func Init(config Config) (*Impl, error) {
 	log.Setup(config.Log)
 	log.Info(config.String())
@@ -38,8 +69,14 @@ func Init(config Config) (*Impl, error) {
 		return nil, err
 	}
 
+	client, err := connectToMongoDb()
+	if err != nil {
+		log.Fatalf("Error creating mongoDB connection: %v", err)
+		return nil, err
+	}
+
 	return &Impl{
-		service: service.New(config.Service, dtlsConfig),
+		service: service.New(config.Service, dtlsConfig, client),
 	}, nil
 }
 

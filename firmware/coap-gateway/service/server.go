@@ -43,6 +43,12 @@ type Server struct {
 	cancel context.CancelFunc
 
 	sigs chan os.Signal
+
+	requestHandler RequestHandler
+}
+
+type RequestHandler struct {
+	mongoClient *mongo.Client
 }
 
 type ListenCertManager = interface {
@@ -50,7 +56,7 @@ type ListenCertManager = interface {
 }
 
 // New creates server.
-func New(config Config, dtlsConfig *piondtls.Config) *Server {
+func New(config Config, dtlsConfig *piondtls.Config, mongoClient *mongo.Client) *Server {
 	var listener dtls.Listener
 
 	l, err := net.NewDTLSListener("udp", config.Addr, dtlsConfig)
@@ -104,6 +110,8 @@ func New(config Config, dtlsConfig *piondtls.Config) *Server {
 
 		ctx:    ctx,
 		cancel: cancel,
+
+		requestHandler: RequestHandler{mongoClient: mongoClient},
 	}
 
 	s.setupCoapServer()
@@ -115,7 +123,7 @@ func (server *Server) setupCoapServer() {
 
 	m := mux.NewRouter()
 	//m.DefaultHandle(mux.HandlerFunc(handleA))
-	m.HandleFunc(uri.Executable, getExecFile)
+	m.HandleFunc(uri.Executable, requestHandler.getExecFile)
 
 	opts := make([]dtls.ServerOption, 0, 5)
 	opts = append(opts, dtls.WithMux(m))

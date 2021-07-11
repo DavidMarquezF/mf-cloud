@@ -1,6 +1,6 @@
 export FQDN="localhost"
 
-go build -ldflags "-linkmode external -extldflags -static" -o firmware-coap ./cmd/service
+go build -ldflags "-linkmode external -extldflags -static" -o firmware-coap ./coap-gateway/cmd/service
 
 
 export NATS_PORT=10001

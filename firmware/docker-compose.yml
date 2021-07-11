@@ -19,12 +19,16 @@ services:
     build: builder
     networks:
       - builder_network
-  #firmware-coap-gateway:
-  #  build: coap-gateway
-  #  ports: 
-  #    - "5690:5682" #Set the port to another one so that it doesn't conflict with plgd
-  #  networks:
-  #    - mongodb_network
+  firmware-coap-gateway:
+    build: coap-gateway
+    ports: 
+      - "5690:5682" #Set the port to another one so that it doesn't conflict with plgd
+    networks:
+      - mongodb_network
+    environment:
+      - MF_MONGO_DB_SERVER=mongodb
+      - MF_CONFIG_MONGODB_ADMINUSERNAME=root
+      - MF_CONFIG_MONGODB_ADMINPASSWORD=pass12345
   mongodb:
     image: mongo
     container_name: mongodb

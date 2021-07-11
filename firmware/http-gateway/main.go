@@ -14,6 +14,8 @@ import (
 	"time"
 
 	mfModules "github.com/DavidMarquezF/mf-cloud/firmware/modules"
+	mfModels "github.com/DavidMarquezF/mf-cloud/firmware/mongodb"
+
 	"github.com/plgd-dev/kit/codec/json"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -138,18 +140,6 @@ func updateDevice(sw *CreateFirmwareRequest, w http.ResponseWriter) error {
 	return nil
 }
 
-type FirmwareInfo struct {
-	ID      primitive.ObjectID `bson:"_id,omitempty"`
-	Date    primitive.DateTime `bson:"date"`
-	Version string             `bson:"version"`
-	Elf     primitive.ObjectID `bson:"elf"`
-}
-
-type FirmwareExec struct {
-	ID   primitive.ObjectID `bson:"_id,omitempty"`
-	Exec primitive.Binary   `bson:"exec"`
-}
-
 func (h *BaseHandler) createFirmware(w http.ResponseWriter, r *http.Request) {
 
 	var body CreateFirmwareRequest
@@ -195,7 +185,7 @@ func (h *BaseHandler) createFirmware(w http.ResponseWriter, r *http.Request) {
 	coll := db.Collection("info")
 	execColl := db.Collection("db")
 
-	execData := FirmwareExec{
+	execData := mfModels.FirmwareExec{
 		Exec: primitive.Binary{Data: respBody},
 	}
 	execInsertResult, err := execColl.InsertOne(context.TODO(), execData)
@@ -205,16 +195,17 @@ func (h *BaseHandler) createFirmware(w http.ResponseWriter, r *http.Request) {
 	}
 	execInsertedId := execInsertResult.InsertedID.(primitive.ObjectID)
 
-	filter := bson.D{{"_id", body.DeviceId}}
 	id, _ := primitive.ObjectIDFromHex(body.DeviceId)
 
-	newData := FirmwareInfo{
+	filter := bson.D{{"_id", id}}
+
+	newData := mfModels.FirmwareInfo{
 		ID:      id,
 		Version: "1.0.0",
 		Date:    primitive.NewDateTimeFromTime(time.Now()),
 		Elf:     execInsertedId,
 	}
-	oldData := FirmwareInfo{}
+	oldData := mfModels.FirmwareInfo{}
 	singleResult := coll.FindOneAndReplace(context.TODO(), filter, newData)
 	err = singleResult.Err()
 	if err != nil {
@@ -241,11 +232,11 @@ func (h *BaseHandler) createFirmware(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	err = changePurl(body, w, "coap://"+os.Getenv("MF_COAP_GATEWAY_SERVER")+":"+os.Getenv("MF_COAP_GATEWAY_SERVER_PORT")+"/api/v1/fmw/"+body.DeviceId+"/exec")
+	err = changePurl(&body, w, "coap://"+os.Getenv("MF_COAP_GATEWAY_SERVER")+":"+os.Getenv("MF_COAP_GATEWAY_SERVER_PORT")+"/api/v1/fmw/"+body.DeviceId+"/exec")
 	if err != nil {
 		return
 	}
-	err = updateDevice()
+	err = updateDevice(&body, w)
 	if err != nil {
 		return
 	}
