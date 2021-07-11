@@ -1,11 +1,9 @@
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
-github.com/DavidMarquezF/mf-cloud v0.0.0-20210514082402-c0bd9f92f63a h1:qMoDnTCnXgpBfK+d1bmCe3dzzTbaQAdFJLeE5ggGbf8=
-github.com/DavidMarquezF/mf-cloud/firmware v0.0.0-20210514082402-c0bd9f92f63a h1:AYmwbHup/wlbv1XgoXPMdgtziVJvgAHYLtpyqNjNoWQ=
-github.com/DavidMarquezF/mf-cloud/firmware v0.0.0-20210514082402-c0bd9f92f63a/go.mod h1:5paBmcQwKeE07m33uGpe5BuswUV8M7ibzbufVTS27SQ=
-github.com/DavidMarquezF/mf-cloud/firmware v0.0.0-20210709075832-e6bb3a8483cd h1:hBRkjkjJ8/9Tlrb+o6eu1+FYhzHLCHJPi5t1Wj0gk4s=
-github.com/DavidMarquezF/mf-cloud/firmware v0.0.0-20210709075832-e6bb3a8483cd/go.mod h1:5paBmcQwKeE07m33uGpe5BuswUV8M7ibzbufVTS27SQ=
+github.com/DavidMarquezF/mf-cloud v0.0.0-20210710152733-1357ed9f19d1 h1:ciLvNZhKJ/dIGBlhjPCOSjmuav/u0xaAgm2FDmLvW7w=
+github.com/DavidMarquezF/mf-cloud/firmware v0.0.0-20210710143433-366e18128c16 h1:+Mq0fCHnQRHDYlsxZDoC19802DcEC7eiUnreWMftlpg=
+github.com/DavidMarquezF/mf-cloud/firmware v0.0.0-20210710143433-366e18128c16/go.mod h1:5paBmcQwKeE07m33uGpe5BuswUV8M7ibzbufVTS27SQ=
 github.com/aws/aws-sdk-go v1.34.28 h1:sscPpn/Ns3i0F4HPEWAVcwdIRaZZCuL7llJ2/60yPIk=
 github.com/aws/aws-sdk-go v1.34.28/go.mod h1:H7NKnBqNVzoTJpGfLrQkkD+ytBA93eiDYi/+8rV9s48=
 github.com/cenkalti/backoff v2.2.1+incompatible/go.mod h1:90ReRw6GdpyfrHakVjL/QHaoyV4aDUVVkXQJJJ3NXXM=
@@ -225,6 +223,7 @@ golang.org/x/sync v0.0.0-20181221193216-37e7f081c4d4/go.mod h1:RxMgew5VJxzue5/jJ
 golang.org/x/sync v0.0.0-20190227155943-e225da77a7e6/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.0.0-20190412183630-56d357773e84/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.0.0-20190423024810-112230192c58/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
+golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e h1:vcxGaoTs7kV8m5Np9uUNQin4BrLOthgV7252N8V+FwY=
 golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.0.0-20210220032951-036812b2e83c h1:5KslGYwFpkhGh+Q16bwMP3cOontH8FOep7tGV86Y7SQ=
 golang.org/x/sync v0.0.0-20210220032951-036812b2e83c/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
