@@ -27,7 +27,8 @@ type Config struct {
 	Log     log.Config            `envconfig:"LOG"`
 }
 type Impl struct {
-	service *service.Server
+	service     *service.Server
+	mongoClient *mongo.Client
 }
 
 func (c Config) String() string {
@@ -38,7 +39,7 @@ func (c Config) String() string {
 func connectToMongoDb() (*mongo.Client, error) {
 	// Prepare mongodb
 	mongoURI := "mongodb://" + os.Getenv("MF_MONGO_DB_SERVER") + ":27017"
-	log.Printf("MONGO URI: %s", mongoURI)
+	log.Info("MONGO URI: %s", mongoURI)
 	credential := options.Credential{
 		Username: os.Getenv("MF_CONFIG_MONGODB_ADMINUSERNAME"),
 		Password: os.Getenv("MF_CONFIG_MONGODB_ADMINPASSWORD"),
@@ -52,7 +53,6 @@ func connectToMongoDb() (*mongo.Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer client.Disconnect(ctx)
 	err = client.Ping(ctx, readpref.Primary())
 	if err != nil {
 		return nil, err
@@ -76,7 +76,8 @@ func Init(config Config) (*Impl, error) {
 	}
 
 	return &Impl{
-		service: service.New(config.Service, dtlsConfig, client),
+		service:     service.New(config.Service, dtlsConfig, client),
+		mongoClient: client,
 	}, nil
 }
 
@@ -117,7 +118,11 @@ func (r *Impl) Serve() error {
 
 // Shutdown shutdowns the service.
 func (r *Impl) Shutdown() error {
-	err := r.service.Shutdown()
+	err := r.mongoClient.Disconnect(context.TODO())
+	if err != nil {
+		return err
+	}
+	err = r.service.Shutdown()
 	return err
 }
 

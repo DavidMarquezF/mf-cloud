@@ -1,10 +1,6 @@
-
 #!/usr/bin/env bash
-#set -e
 
-
-
-export CERTIFICATES_PATH="./certs"
+export CERTIFICATES_PATH="${MF_CERTS_PATH:-./certs}"
 export LOGS_PATH="./log"
 
 export INTERNAL_CERT_DIR_PATH="$CERTIFICATES_PATH/internal"
@@ -37,6 +33,7 @@ mkdir -p $LOGS_PATH
 
 
 echo "starting coap-gateway-secure"
+
 #need to export variable to make it available to subprocess
 # Blockwise has to be enabled in order to get the firmware
 export ADDRESS=${FIRMWARE_COAP_ADDRESS}
@@ -50,15 +47,5 @@ export LISTEN_FILE_DISABLE_VERIFY_CLIENT_CERTIFICATE=${FIRMWARE_COAP_DISABLE_VER
 export DISABLE_BLOCKWISE_TRANSFER=false 
 export BLOCKWISE_TRANSFER_SZX=${FIRMWARE_COAP_BLOCKWISE_TRANSFER_SZX}
 export DISABLE_PEER_TCP_SIGNAL_MESSAGE_CSMS=${FIRMWARE_COAP_DISABLE_PEER_TCP_SIGNAL_MESSAGE_CSMS} 
-./firmware-coap >$LOGS_PATH/firmware-coap.log 2>&1 
-status=$?
-if [ $status -ne 0 ]; then
-  echo "Failed to start coap-gateway: $status"
-  sync
-  cat $LOGS_PATH/firmware-coap.log
-  exit $status
-fi
 
-
-
-
+./firmware-coap | tee $LOGS_PATH/firmware-coap.log  

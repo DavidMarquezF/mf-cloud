@@ -3,8 +3,10 @@ package service
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io/ioutil"
 	"log"
+	"strings"
 
 	"github.com/DavidMarquezF/mf-cloud/firmware/coap-gateway/uri"
 	mfModels "github.com/DavidMarquezF/mf-cloud/firmware/mongodb"
@@ -17,13 +19,14 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func getData(client *mongo.Client, deviceId string) error {
-	db := client.mongoClient.Database("fmw")
+func getData(w mux.ResponseWriter, client *mongo.Client, deviceId string) error {
+	db := client.Database("fmw")
 	coll := db.Collection("info")
 	execColl := db.Collection("db")
 
 	id, _ := primitive.ObjectIDFromHex(deviceId)
 
+	// Find the info
 	filter := bson.D{{"_id", id}}
 
 	singleResult := coll.FindOne(context.TODO(), filter)
@@ -39,14 +42,36 @@ func getData(client *mongo.Client, deviceId string) error {
 	fmwInfo := mfModels.FirmwareInfo{}
 
 	singleResult.Decode(&fmwInfo)
-	log.Print(fmwInfo)
 
+	// Find the exec
+	singleResultExec := execColl.FindOne(context.TODO(), bson.D{{"_id", fmwInfo.Elf}})
+	err = singleResultExec.Err()
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			w.SetResponse(codes.BadRequest, message.TextPlain, strings.NewReader(fmt.Sprintf("Exec %s not found", fmwInfo.Elf)))
+		} else {
+			w.SetResponse(codes.InternalServerError, message.TextPlain, strings.NewReader(fmt.Sprintf("Error getting exec %s: %w", fmwInfo.Elf, err)))
+		}
+		return err
+	}
+	execInfo := mfModels.FirmwareExec{}
+
+	singleResultExec.Decode(&execInfo)
+
+	w.SetResponse(codes.Content, message.TextPlain, bytes.NewReader(execInfo.Exec.Data))
+
+	return nil
 }
 
 func (h *RequestHandler) getExecFile(w mux.ResponseWriter, r *mux.Message) {
 	firmwareID := r.RouteParams.Vars[uri.FirmwareIdKey]
 	log.Println(firmwareID)
 
+	err := getData(w, h.mongoClient, firmwareID)
+	if err != nil {
+		log.Printf("Error obtaining exec: %w", err)
+		return
+	}
 	content, err := ioutil.ReadFile("test")
 	err = w.SetResponse(codes.Content, message.TextPlain, bytes.NewReader(content))
 	if err != nil {

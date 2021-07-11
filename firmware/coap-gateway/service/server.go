@@ -16,6 +16,7 @@ import (
 	"github.com/plgd-dev/go-coap/v2/mux"
 	"github.com/plgd-dev/go-coap/v2/net"
 	"github.com/plgd-dev/go-coap/v2/net/blockwise"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 //Server a configuration of coapgateway
@@ -123,7 +124,7 @@ func (server *Server) setupCoapServer() {
 
 	m := mux.NewRouter()
 	//m.DefaultHandle(mux.HandlerFunc(handleA))
-	m.HandleFunc(uri.Executable, requestHandler.getExecFile)
+	m.HandleFunc(uri.Executable, server.requestHandler.getExecFile)
 
 	opts := make([]dtls.ServerOption, 0, 5)
 	opts = append(opts, dtls.WithMux(m))
