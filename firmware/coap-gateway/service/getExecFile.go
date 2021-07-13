@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"strings"
 
@@ -14,9 +13,8 @@ import (
 	"github.com/plgd-dev/go-coap/v2/message/codes"
 	"github.com/plgd-dev/go-coap/v2/mux"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func getData(w mux.ResponseWriter, client *mongo.Client, deviceId string) error {
@@ -57,25 +55,23 @@ func getData(w mux.ResponseWriter, client *mongo.Client, deviceId string) error 
 	execInfo := mfModels.FirmwareExec{}
 
 	singleResultExec.Decode(&execInfo)
-
 	w.SetResponse(codes.Content, message.TextPlain, bytes.NewReader(execInfo.Exec.Data))
 
 	return nil
 }
 
 func (h *RequestHandler) getExecFile(w mux.ResponseWriter, r *mux.Message) {
-	firmwareID := r.RouteParams.Vars[uri.FirmwareIdKey]
-	log.Println(firmwareID)
-
-	err := getData(w, h.mongoClient, firmwareID)
+	hashId := r.RouteParams.Vars[uri.FirmwareIdKey]
+	log.Printf("Device Id: %s", hashId)
+	err := getData(w, h.mongoClient, hashId)
 	if err != nil {
 		log.Printf("Error obtaining exec: %w", err)
 		return
 	}
-	content, err := ioutil.ReadFile("test")
-	err = w.SetResponse(codes.Content, message.TextPlain, bytes.NewReader(content))
-	if err != nil {
-		log.Println("cannot set response: %v", err)
-	}
+	//content, err := ioutil.ReadFile("test")
+	//err = w.SetResponse(codes.Content, message.TextPlain, bytes.NewReader(content))
+	//if err != nil {
+	//		log.Println("cannot set response: %v", err)
+	//}
 
 }
