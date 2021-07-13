@@ -22,6 +22,7 @@ type Module struct {
 
 type FirmwareConfig struct {
 	DeviceId   string   `json:"device_id"`
+	Version    string   `json:"version"`
 	DeviceName string   `json:"device_name"`
 	Platform   Platform `json:"platform"`
 	Modules    []Module `json:"modules"`
