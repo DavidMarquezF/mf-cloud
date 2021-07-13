@@ -4,8 +4,13 @@ github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03
 github.com/DavidMarquezF/mf-cloud v0.0.0-20210710152733-1357ed9f19d1 h1:ciLvNZhKJ/dIGBlhjPCOSjmuav/u0xaAgm2FDmLvW7w=
 github.com/DavidMarquezF/mf-cloud v0.0.0-20210711152338-29992d00861c h1:Nl/v2McS0P8OLZcjDm7yCOGYvatecDs5YFUUTPfW+dA=
 github.com/DavidMarquezF/mf-cloud v0.0.0-20210711152338-29992d00861c/go.mod h1:8Y7/3RMynnm86qqfGRpddDkS1vV0eRw3rhDNF2f/z8k=
+github.com/DavidMarquezF/mf-cloud v0.0.0-20210713094632-3548d9da6143 h1:+HIX8DonPchArAjGujPaRPhyE4VGBKOx3gjKqZBsmJo=
 github.com/DavidMarquezF/mf-cloud/firmware v0.0.0-20210710143433-366e18128c16 h1:+Mq0fCHnQRHDYlsxZDoC19802DcEC7eiUnreWMftlpg=
 github.com/DavidMarquezF/mf-cloud/firmware v0.0.0-20210710143433-366e18128c16/go.mod h1:5paBmcQwKeE07m33uGpe5BuswUV8M7ibzbufVTS27SQ=
+github.com/DavidMarquezF/mf-cloud/firmware/modules v0.0.0-20210713094632-3548d9da6143 h1:XcB3zmxYTuJF3Jd51a2kzcZpzG09Nco5+PqlsxVwYDw=
+github.com/DavidMarquezF/mf-cloud/firmware/modules v0.0.0-20210713094632-3548d9da6143/go.mod h1:pSLL6px+EpJIdJOHoq5RdUg9LNXpnZ4M+WlZiJoQCDg=
+github.com/DavidMarquezF/mf-cloud/firmware/mongodb v0.0.0-20210713094632-3548d9da6143 h1:ONfhWlJcS87jSGlRXhEKmaL5NiWy1i3HA3WVGjK2ZfA=
+github.com/DavidMarquezF/mf-cloud/firmware/mongodb v0.0.0-20210713094632-3548d9da6143/go.mod h1:F/s5b0AcWmgtvvqvVHQRwl0iDs56qeNWw1KuTkh5qGc=
 github.com/aws/aws-sdk-go v1.34.28 h1:sscPpn/Ns3i0F4HPEWAVcwdIRaZZCuL7llJ2/60yPIk=
 github.com/aws/aws-sdk-go v1.34.28/go.mod h1:H7NKnBqNVzoTJpGfLrQkkD+ytBA93eiDYi/+8rV9s48=
 github.com/cenkalti/backoff v2.2.1+incompatible/go.mod h1:90ReRw6GdpyfrHakVjL/QHaoyV4aDUVVkXQJJJ3NXXM=
