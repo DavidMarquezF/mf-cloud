@@ -170,6 +170,7 @@ func (h *BaseHandler) createFirmware(w http.ResponseWriter, r *http.Request) {
 		DeviceName: "Mf Device",
 		Platform:   mfModules.ESP32,
 		Modules:    modules,
+		Version:    "1.0.0.0",
 	}
 
 	b, _ := json.Encode(conf)
