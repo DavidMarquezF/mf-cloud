@@ -15,6 +15,8 @@ services:
       - MF_BUILDER_SERVER_PORT=8091
       - MF_CONFIG_MONGODB_ADMINUSERNAME=root
       - MF_CONFIG_MONGODB_ADMINPASSWORD=pass12345
+      - MF_COAP_GATEWAY_SERVER=172.20.1.211
+      - MF_COAP_GATEWAY_SERVER_PORT=5690
   firmware-builder:
     build: builder
     networks:
@@ -22,7 +24,7 @@ services:
   firmware-coap-gateway:
     build: coap-gateway
     ports: 
-      - "5690:5682" #Set the port to another one so that it doesn't conflict with plgd
+      - "5690:5684/udp" #Set the port to another one so that it doesn't conflict with plgd  
     networks:
       - mongodb_network
     environment:
@@ -30,7 +32,6 @@ services:
       - MF_CONFIG_MONGODB_ADMINUSERNAME=root
       - MF_CONFIG_MONGODB_ADMINPASSWORD=pass12345
       - MF_CERTS_PATH=/certs
-      - MF_COAP_PORT
     depends_on:
       - mongodb
     volumes:
