@@ -27,6 +27,15 @@ func writeError(w http.ResponseWriter, err error) {
 	http.Error(w, string(b), http.StatusBadRequest)
 }
 
+func prepareBuildEnv(idfPath string, mfEmbbedPath string) error {
+
+	cmd := exec.Command(filepath.Join(idfPath, "tools", "idf.py"), "fullclean")
+	cmd.Dir = mfEmbbedPath
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
 func createFirmware(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -63,7 +72,14 @@ func createFirmware(w http.ResponseWriter, r *http.Request) {
 	}
 	idfPath := os.Getenv("IDF_PATH")
 	mfEmbbedPath := os.Getenv("MF_EMBEDDED_SRC_PATH")
-	cmd := exec.Command(filepath.Join(idfPath, "tools", "idf.py"), "build", "-DMF_NUMBER_COMPONENTS="+fmt.Sprintf("%v", len(conf.Modules)))
+	err = prepareBuildEnv(idfPath, mfEmbbedPath)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Couldn't prepare build env successfully", http.StatusInternalServerError)
+		return
+	}
+
+	cmd := exec.Command(filepath.Join(idfPath, "tools", "idf.py"), "build", "-DMF_NUMBER_COMPONENTS="+fmt.Sprintf("%v", len(conf.Modules)), "-DMF_PROJECT_VERSION="+conf.Version)
 	cmd.Dir = mfEmbbedPath
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
