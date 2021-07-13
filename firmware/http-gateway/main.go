@@ -16,6 +16,8 @@ import (
 	mfModules "github.com/DavidMarquezF/mf-cloud/firmware/modules"
 	mfModels "github.com/DavidMarquezF/mf-cloud/firmware/mongodb"
 
+	"crypto/sha1"
+
 	"github.com/plgd-dev/kit/codec/json"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -63,6 +65,15 @@ func writeError(w http.ResponseWriter, err error) {
 	http.Error(w, string(b), http.StatusBadRequest)
 }
 
+func getHash(deviceId string) string {
+	h := sha1.New()
+	h.Write([]byte(deviceId))
+	bs := h.Sum(nil)
+	hexValue := fmt.Sprintf("%x", bs)
+
+	return hexValue[:24]
+}
+
 func changePurl(sw *CreateFirmwareRequest, w http.ResponseWriter, url string) error {
 	swUpdatebody := SoftwareResource{
 		Purl:           url,
@@ -95,7 +106,7 @@ func changePurl(sw *CreateFirmwareRequest, w http.ResponseWriter, url string) er
 
 	statusOk := resp.StatusCode >= 200 && resp.StatusCode < 300
 	if !statusOk {
-		http.Error(w, string(body), resp.StatusCode)
+		http.Error(w, `{"err": "Cannot change purl device", "internalErr": `+string(body)+`}`, resp.StatusCode)
 		return fmt.Errorf("Cannot change purl: %w", err)
 	}
 
@@ -125,13 +136,13 @@ func updateDevice(sw *CreateFirmwareRequest, w http.ResponseWriter) error {
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		writeError(w, fmt.Errorf("Cannot change update device: %w", err))
+		writeError(w, fmt.Errorf("Cannot update device: %w", err))
 		return err
 	}
 
 	statusOk := resp.StatusCode >= 200 && resp.StatusCode < 300
 	if !statusOk {
-		http.Error(w, string(body), resp.StatusCode)
+		http.Error(w, `{"err": "Cannot update device", "internalErr": `+string(body)+`}`, resp.StatusCode)
 		return errors.New("error")
 	}
 
@@ -195,8 +206,15 @@ func (h *BaseHandler) createFirmware(w http.ResponseWriter, r *http.Request) {
 	}
 	execInsertedId := execInsertResult.InsertedID.(primitive.ObjectID)
 
-	id, _ := primitive.ObjectIDFromHex(body.DeviceId)
+	hashId := getHash(body.DeviceId)
+	log.Printf("Generated hash: %s", hashId)
 
+	id, err := primitive.ObjectIDFromHex(hashId)
+	if err != nil {
+		writeError(w, fmt.Errorf("Error generating id: %w", err))
+		return
+	}
+	log.Print(id)
 	filter := bson.D{{"_id", id}}
 
 	newData := mfModels.FirmwareInfo{
@@ -205,7 +223,6 @@ func (h *BaseHandler) createFirmware(w http.ResponseWriter, r *http.Request) {
 		Date:    primitive.NewDateTimeFromTime(time.Now()),
 		Elf:     execInsertedId,
 	}
-	oldData := mfModels.FirmwareInfo{}
 	singleResult := coll.FindOneAndReplace(context.TODO(), filter, newData)
 	err = singleResult.Err()
 	if err != nil {
@@ -222,17 +239,19 @@ func (h *BaseHandler) createFirmware(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}
+	oldData := mfModels.FirmwareInfo{}
 
 	if singleResult.Err() != mongo.ErrNoDocuments {
 		singleResult.Decode(&oldData)
-		_, err = execColl.DeleteOne(context.TODO(), bson.M{"_id": oldData})
+		_, err = execColl.DeleteOne(context.TODO(), bson.M{"_id": oldData.ID})
 		if err != nil {
 			writeError(w, fmt.Errorf("Error deleting old exec: %w", err))
 			return
 		}
 	}
-
-	err = changePurl(&body, w, "coaps://"+os.Getenv("MF_COAP_GATEWAY_SERVER")+":"+os.Getenv("MF_COAP_GATEWAY_SERVER_PORT")+"/api/v1/fmw/"+body.DeviceId+"/exec")
+	url := "coaps://" + os.Getenv("MF_COAP_GATEWAY_SERVER") + ":" + os.Getenv("MF_COAP_GATEWAY_SERVER_PORT") + "/v1/fmw/" + hashId + "/exec"
+	log.Printf("Device url: %s", url)
+	err = changePurl(&body, w, url)
 	if err != nil {
 		return
 	}
